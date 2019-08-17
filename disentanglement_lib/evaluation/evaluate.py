@@ -35,6 +35,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 import gin.tf
+import wandb
 
 
 def evaluate_with_gin(model_dir,
@@ -130,5 +131,7 @@ def evaluate(model_dir,
   original_results_dir = os.path.join(model_dir, "results")
   results_dir = os.path.join(output_dir, "results")
   results_dict["elapsed_time"] = time.time() - experiment_timer
+  for key, val in results_dict.items():
+    wandb.run.summary[key] = value
   results.update_result_directory(results_dir, "evaluation", results_dict,
                                   original_results_dir)

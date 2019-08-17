@@ -28,6 +28,9 @@ from disentanglement_lib.methods.unsupervised import train
 from disentanglement_lib.postprocessing import postprocess
 from disentanglement_lib.visualize import visualize_model
 import numpy as np
+import wandb
+
+
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("study", "unsupervised_study_v1",
@@ -47,6 +50,7 @@ flags.DEFINE_boolean("only_print", False,
 flags.DEFINE_boolean("overwrite", False,
                      "Whether to overwrite output directory.")
 
+wandb.init(config=tf.flags.FLAGS, sync_tensorboard=True)
 
 def main(unused_argv):
   # Obtain the study to reproduce.
@@ -114,7 +118,7 @@ def main(unused_argv):
         "postprocess.random_seed = {}".format(random_state.randint(2**32)),
         "postprocess.name = '{}'".format(post_name)
     ]
-    postprocess.postprocess_with_gin(model_dir, post_dir, FLAGS.overwrite,
+    #postprocess.postprocess_with_gin(model_dir, post_dir, FLAGS.overwrite,
                                      [config], postprocess_bindings)
 
   # Iterate through the disentanglement metrics.
