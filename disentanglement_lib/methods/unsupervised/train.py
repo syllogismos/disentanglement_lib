@@ -28,7 +28,7 @@ import numpy as np
 import tensorflow as tf
 import gin.tf.external_configurables  # pylint: disable=unused-import
 import gin.tf
-
+import wandb
 
 def train_with_gin(model_dir,
                    overwrite=False,
@@ -120,7 +120,7 @@ def train(model_dir,
   # Do the actual training.
   tpu_estimator.train(
       input_fn=_make_input_fn(dataset, random_state.randint(2**32)),
-      steps=training_steps)
+      steps=training_steps, hooks=[wandb.tensorflow.WandbHook(steps_per_log=1000)])
 
   # Save model as a TFHub module.
   output_shape = named_data.get_named_ground_truth_data().observation_shape

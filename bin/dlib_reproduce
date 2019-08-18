@@ -23,11 +23,13 @@ from absl import app
 from absl import flags
 from absl import logging
 from disentanglement_lib.config import reproduce
+from disentanglement_lib.config.unsupervised_study_v1 import sweep
 from disentanglement_lib.evaluation import evaluate
 from disentanglement_lib.methods.unsupervised import train
 from disentanglement_lib.postprocessing import postprocess
 from disentanglement_lib.visualize import visualize_model
 import numpy as np
+import wandb
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("study", "unsupervised_study_v1",
@@ -48,9 +50,13 @@ flags.DEFINE_boolean("overwrite", False,
                      "Whether to overwrite output directory.")
 
 
+
 def main(unused_argv):
   # Obtain the study to reproduce.
+  wandb.init(config=flags, sync_tensorboard=True)
   study = reproduce.STUDIES[FLAGS.study]
+  model_num_config = sweep.get_config()[FLAGS.model_num]
+  wandb.config.update(model_num_config)
 
   # Print the hyperparameter settings.
   if FLAGS.model_dir is None:
@@ -135,6 +141,7 @@ def main(unused_argv):
       ]
       evaluate.evaluate_with_gin(post_dir, metric_dir, FLAGS.overwrite,
                                  [gin_eval_config], eval_bindings)
+  wandb.save(output_directory)
 
 
 if __name__ == "__main__":
